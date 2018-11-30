@@ -113,6 +113,10 @@ static int connect(int argc, char **argv) {
     }
 
     struct Wifi_login wifi;
+    char wifi_ssid[strlen(join_args.ssid->sval[0])];
+    char wifi_pwd[strlen(join_args.password->sval[0])];
+    wifi.ssid = &wifi_ssid[0];
+    wifi.pwd = &wifi_pwd[0];
     strncpy(wifi.ssid, join_args.ssid->sval[0], strlen(join_args.ssid->sval[0]));
     wifi.ssid_length = strlen(join_args.ssid->sval[0]);
     strncpy(wifi.pwd, join_args.password->sval[0], strlen(join_args.password->sval[0]));
@@ -131,7 +135,8 @@ static int connect(int argc, char **argv) {
     ESP_LOGI(__func__, "Connected");
     // Store the wifi login data
 
-//    store_wifi_login(wifi);
+    memory_error_check(kv_store("wifi_data", "wifi_ssid", wifi.ssid, wifi.ssid_length));
+    memory_error_check(kv_store("wifi_data", "wifi_pwd", wifi.pwd, wifi.pwd_length));
     return 0;
 }
 
