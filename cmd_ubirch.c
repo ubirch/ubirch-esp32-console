@@ -26,8 +26,9 @@
 #include <esp_log.h>
 #include <esp_console.h>
 #include <argtable3/argtable3.h>
+#include <string.h>
 
-#include "key_handling.h"
+//#include "key_handling.h"
 #include "networking.h"
 
 #include "cmd_ubirch.h"
@@ -57,25 +58,25 @@ void register_exit() {
  * 'run' command runs the rest of the program
  */
 static int run_status(int argc, char **argv) {
-    ESP_LOGI(__func__, "Current Status\r\n");
-    struct Wifi_login wifi;
-    char buffer[65] = {};
-    // show the Hardware device ID
-    get_hw_ID();
-    // show the Public Key, if available
-    if (!get_public_key(buffer)) {
-        ESP_LOGI("Public Key not available", "");
-    } else {
-        ESP_LOGI("Public Key", "%s", buffer);
-    }
-    // show the wifi login information, if available
-    if (!load_wifi_login(&wifi)) {
-        ESP_LOGI("Wifi SSID", "%s", wifi.ssid);
-        ESP_LOGD("Wifi PWD", "%s", wifi.pwd);
-    } else {
-        ESP_LOGI("Wifi not configured yet", "type join to do so");
-    }
-    time_status();
+//    ESP_LOGI(__func__, "Current Status\r\n");
+//    struct Wifi_login wifi;
+//    char buffer[65] = {};
+//    // show the Hardware device ID
+//    get_hw_ID();
+//    // show the Public Key, if available
+//    if (!get_public_key(buffer)) {
+//        ESP_LOGI("Public Key not available", "");
+//    } else {
+//        ESP_LOGI("Public Key", "%s", buffer);
+//    }
+//    // show the wifi login information, if available
+//    if (!load_wifi_login(&wifi)) {
+//        ESP_LOGI("Wifi SSID", "%s", wifi.ssid);
+//        ESP_LOGD("Wifi PWD", "%s", wifi.pwd);
+//    } else {
+//        ESP_LOGI("Wifi not configured yet", "type join to do so");
+//    }
+//    time_status();
 
     return ESP_OK;
 }
@@ -130,7 +131,7 @@ static int connect(int argc, char **argv) {
     ESP_LOGI(__func__, "Connected");
     // Store the wifi login data
 
-    store_wifi_login(wifi);
+//    store_wifi_login(wifi);
     return 0;
 }
 
