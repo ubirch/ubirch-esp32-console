@@ -34,6 +34,8 @@
 #include "cmd_ubirch.h"
 #include "storage.h"
 #include "sntp_time.h"
+#include "util.h"
+#include "key_handling.h"
 
 /*
  * 'exit' command exits the console and runs the rest of the program
@@ -58,25 +60,30 @@ void register_exit() {
  * 'run' command runs the rest of the program
  */
 static int run_status(int argc, char **argv) {
-//    ESP_LOGI(__func__, "Current Status\r\n");
-//    struct Wifi_login wifi;
-//    char buffer[65] = {};
-//    // show the Hardware device ID
-//    get_hw_ID();
-//    // show the Public Key, if available
-//    if (!get_public_key(buffer)) {
-//        ESP_LOGI("Public Key not available", "");
-//    } else {
-//        ESP_LOGI("Public Key", "%s", buffer);
-//    }
-//    // show the wifi login information, if available
-//    if (!load_wifi_login(&wifi)) {
-//        ESP_LOGI("Wifi SSID", "%s", wifi.ssid);
-//        ESP_LOGD("Wifi PWD", "%s", wifi.pwd);
-//    } else {
-//        ESP_LOGI("Wifi not configured yet", "type join to do so");
-//    }
-//    time_status();
+    ESP_LOGI(__func__, "Current Status\r\n");
+    esp_err_t err;
+    struct Wifi_login wifi;
+    char buffer[65] = {};
+    // show the Hardware device ID
+    get_hw_ID();
+    // show the Public Key, if available
+    if (!get_public_key(buffer)) {
+        ESP_LOGI("Public Key not available", "");
+    } else {
+        ESP_LOGI("Public Key", "%s", buffer);
+    }
+    // show the wifi login information, if available
+    err = kv_load("wifi_data", "wifi_ssid", (void **) &wifi.ssid, &wifi.ssid_length);
+    if (err == ESP_OK) {
+        ESP_LOGD(__func__, "%s", wifi.ssid);
+        kv_load("wifi_data", "wifi_pwd", (void **) &wifi.pwd, &wifi.pwd_length);
+        ESP_LOGD(__func__, "%s", wifi.pwd);
+        ESP_LOGI("Wifi SSID", "%s", wifi.ssid);
+        ESP_LOGD("Wifi PWD", "%s", wifi.pwd);
+    } else {
+        ESP_LOGI("Wifi not configured yet", "type join to do so");
+    }
+    time_status();
 
     return ESP_OK;
 }
@@ -111,7 +118,7 @@ static int connect(int argc, char **argv) {
         arg_print_errors(stderr, join_args.end, argv[0]);
         return 1;
     }
-
+    // create a struct for the wifi login and copy the input parameters into it
     struct Wifi_login wifi;
     char wifi_ssid[strlen(join_args.ssid->sval[0])];
     char wifi_pwd[strlen(join_args.password->sval[0])];
@@ -122,13 +129,10 @@ static int connect(int argc, char **argv) {
     strncpy(wifi.pwd, join_args.password->sval[0], strlen(join_args.password->sval[0]));
     wifi.pwd_length = strlen(join_args.password->sval[0]);
 
-    ESP_LOGI(__func__, "Connecting to '%s'",
-             join_args.ssid->sval[0]);
+    ESP_LOGI(__func__, "Connecting to '%s'", join_args.ssid->sval[0]);
 
-
-    bool connected = wifi_join(wifi,
-                               join_args.timeout->ival[0]);
-    if (!connected) {
+    esp_err_t err = wifi_join(wifi, join_args.timeout->ival[0]);
+    if (err != ESP_OK) {
         ESP_LOGW(__func__, "Connection timed out");
         return 1;
     }
