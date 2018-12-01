@@ -33,7 +33,6 @@
 
 #include "cmd_ubirch.h"
 #include "storage.h"
-#include "sntp_time.h"
 #include "util.h"
 #include "key_handling.h"
 
@@ -78,12 +77,20 @@ static int run_status(int argc, char **argv) {
         ESP_LOGD(__func__, "%s", wifi.ssid);
         kv_load("wifi_data", "wifi_pwd", (void **) &wifi.pwd, &wifi.pwd_length);
         ESP_LOGD(__func__, "%s", wifi.pwd);
-        printf("Wifi SSID : %s\r\n", wifi.ssid);
-        ESP_LOGD("Wifi PWD", "%s", wifi.pwd);
+        printf("Wifi SSID : %.*s\r\n", wifi.ssid_length, wifi.ssid);
+        ESP_LOGD("Wifi PWD", "%.*s", wifi.pwd_length, wifi.pwd);
     } else {
         printf("! Wifi not configured yet! \r\n type join to do so \r\n");
     }
-    time_status();
+
+    time_t now;
+    struct tm timeinfo = {0};
+
+    time(&now);
+    localtime_r(&now, &timeinfo);
+    printf("%02d.%02d.%04d %02d:%02d:%02d\r\n",
+           timeinfo.tm_mday, timeinfo.tm_mon + 1, (1900 + timeinfo.tm_year),
+           timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
 
     return ESP_OK;
 }
@@ -129,11 +136,8 @@ static int connect(int argc, char **argv) {
     };
     strncpy(wifi.ssid, join_args.ssid->sval[0], wifi.ssid_length);
     strncpy(wifi.pwd, join_args.password->sval[0], wifi.pwd_length);
-    // TODO terminate the strings
-//    wifi_ssid[wifi.ssid_length-1] = '\0';
-//    wifi_pwd[wifi.pwd_length-1] = '\0';
 
-    ESP_LOGI(__func__, "Connecting to '%s'", join_args.ssid->sval[0]);
+    ESP_LOGI(__func__, "Connecting to '%.*s'", wifi.ssid_length, join_args.ssid->sval[0]);
 
     esp_err_t err = wifi_join(wifi, join_args.timeout->ival[0]);
     if (err != ESP_OK) {
@@ -150,7 +154,7 @@ static int connect(int argc, char **argv) {
 
 void register_wifi() {
     join_args.timeout = arg_int0(NULL, "timeout", "<t>", "Connection timeout, ms");
-    join_args.timeout->ival[0] = 5000; // set default value
+    join_args.timeout->ival[0] = 20000; // set default value
     join_args.ssid = arg_str1(NULL, NULL, "<ssid>", "SSID of AP");
     join_args.password = arg_str0(NULL, NULL, "<pass>", "PSK of AP");
     join_args.end = arg_end(2);
