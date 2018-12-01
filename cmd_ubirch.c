@@ -68,9 +68,9 @@ static int run_status(int argc, char **argv) {
     get_hw_ID();
     // show the Public Key, if available
     if (!get_public_key(buffer)) {
-        ESP_LOGI("Public Key not available", "");
+        printf("Public Key not available\r\n");
     } else {
-        ESP_LOGI("Public Key", "%s", buffer);
+        printf("Public Key: %s\r\n", buffer);
     }
     // show the wifi login information, if available
     err = kv_load("wifi_data", "wifi_ssid", (void **) &wifi.ssid, &wifi.ssid_length);
@@ -78,10 +78,10 @@ static int run_status(int argc, char **argv) {
         ESP_LOGD(__func__, "%s", wifi.ssid);
         kv_load("wifi_data", "wifi_pwd", (void **) &wifi.pwd, &wifi.pwd_length);
         ESP_LOGD(__func__, "%s", wifi.pwd);
-        ESP_LOGI("Wifi SSID", "%s", wifi.ssid);
+        printf("Wifi SSID : %s\r\n", wifi.ssid);
         ESP_LOGD("Wifi PWD", "%s", wifi.pwd);
     } else {
-        ESP_LOGI("Wifi not configured yet", "type join to do so");
+        printf("! Wifi not configured yet! \r\n type join to do so \r\n");
     }
     time_status();
 
@@ -119,15 +119,19 @@ static int connect(int argc, char **argv) {
         return 1;
     }
     // create a struct for the wifi login and copy the input parameters into it
-    struct Wifi_login wifi;
     char wifi_ssid[strlen(join_args.ssid->sval[0])];
     char wifi_pwd[strlen(join_args.password->sval[0])];
-    wifi.ssid = &wifi_ssid[0];
-    wifi.pwd = &wifi_pwd[0];
-    strncpy(wifi.ssid, join_args.ssid->sval[0], strlen(join_args.ssid->sval[0]));
-    wifi.ssid_length = strlen(join_args.ssid->sval[0]);
-    strncpy(wifi.pwd, join_args.password->sval[0], strlen(join_args.password->sval[0]));
-    wifi.pwd_length = strlen(join_args.password->sval[0]);
+    struct Wifi_login wifi = {
+            .ssid = &wifi_ssid[0],
+            .pwd = &wifi_pwd[0],
+            .ssid_length = strlen(join_args.ssid->sval[0]),
+            .pwd_length = strlen(join_args.password->sval[0])
+    };
+    strncpy(wifi.ssid, join_args.ssid->sval[0], wifi.ssid_length);
+    strncpy(wifi.pwd, join_args.password->sval[0], wifi.pwd_length);
+    // TODO terminate the strings
+//    wifi_ssid[wifi.ssid_length-1] = '\0';
+//    wifi_pwd[wifi.pwd_length-1] = '\0';
 
     ESP_LOGI(__func__, "Connecting to '%s'", join_args.ssid->sval[0]);
 
