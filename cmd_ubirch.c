@@ -33,8 +33,6 @@
 
 #include "cmd_ubirch.h"
 #include "storage.h"
-#include "util.h"
-#include "key_handling.h"
 
 /*
  * 'exit' command exits the console and runs the rest of the program
@@ -64,8 +62,11 @@ static int run_status(int argc, char **argv) {
     struct Wifi_login wifi;
     char buffer[65] = {};
     // show the Hardware device ID
+    // TODO this is a reference outside of the component (use different method here)
     get_hw_ID();
     // show the Public Key, if available
+
+    // TODO this is a reference outside of the component (use kv_load to load from flash)
     if (!get_public_key(buffer)) {
         printf("Public Key not available\r\n");
     } else {
