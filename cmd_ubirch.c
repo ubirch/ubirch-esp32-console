@@ -59,7 +59,7 @@ void register_exit() {
 static int run_status(int argc, char **argv) {
     esp_err_t err;
     struct Wifi_login wifi = {0};
-    char buffer[65] = {};
+
     // show the Hardware device ID
     unsigned char *hw_ID = NULL;
     size_t hw_ID_len = 0;
