@@ -57,32 +57,35 @@ void register_exit() {
  * 'run' command runs the rest of the program
  */
 static int run_status(int argc, char **argv) {
-    ESP_LOGI(__func__, "Current Status\r\n");
     esp_err_t err;
-    struct Wifi_login wifi;
+    struct Wifi_login wifi = {0};
     char buffer[65] = {};
     // show the Hardware device ID
-    unsigned char *hw_ID;
+    unsigned char *hw_ID = NULL;
     size_t hw_ID_len = 0;
+
+    printf("UBIRCH device status:\r\n");
+
+    // show hardware device id
     kv_load("device-status", "hw-dev-id", (void **) &hw_ID, &hw_ID_len);
     printf("Hardware-Device-ID: %02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X\r\n",
            hw_ID[0], hw_ID[1], hw_ID[2], hw_ID[3], hw_ID[4], hw_ID[5], hw_ID[6], hw_ID[7],
            hw_ID[8], hw_ID[9], hw_ID[10], hw_ID[11], hw_ID[12], hw_ID[13], hw_ID[14], hw_ID[15]);
     free(hw_ID);
-    // show the Public Key, if available
+
+    // show the public key, if available
     unsigned char *key;
-    // read the secret key
-    size_t size_pk = 0;
-    err = kv_load("key_storage", "public_key", (void **) &key, &size_pk);
+    size_t key_size = 0;
+    err = kv_load("key_storage", "public_key", (void **) &key, &key_size);
     if (!memory_error_check(err)) {
-        printf("Public Key: 0x");
-        for (int i = 0; i < size_pk; ++i) {
+        printf("Public key: ");
+        for (int i = 0; i < key_size; ++i) {
             printf("%02X", key[i]);
         }
         printf("\r\n");
         free(key);
     } else {
-        printf("Public Key not available\r\n");
+        printf("Public key not available.\r\n");
     }
 
     // show the wifi login information, if available
@@ -96,7 +99,7 @@ static int run_status(int argc, char **argv) {
         free(wifi.ssid);
         free(wifi.pwd);
     } else {
-        printf("! Wifi not configured yet! \r\n type join to do so \r\n");
+        ESP_LOGE("status", "Wifi not configured yet!\r\ntype join to do so\r\n");
     }
 
     time_t now;
@@ -104,7 +107,7 @@ static int run_status(int argc, char **argv) {
 
     time(&now);
     localtime_r(&now, &timeinfo);
-    printf("%02d.%02d.%04d %02d:%02d:%02d\r\n",
+    printf("Current time: %02d.%02d.%04d %02d:%02d:%02d\r\n",
            timeinfo.tm_mday, timeinfo.tm_mon + 1, (1900 + timeinfo.tm_year),
            timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
 
