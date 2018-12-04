@@ -1,5 +1,5 @@
 /*!
- * #file    console_cmd.c
+ * #file    cmd_ubirch.c
  * #brief   Custom Console commands.
  *
  * #author Waldemar Gruenwald
@@ -62,16 +62,29 @@ static int run_status(int argc, char **argv) {
     struct Wifi_login wifi;
     char buffer[65] = {};
     // show the Hardware device ID
-    // TODO this is a reference outside of the component (use different method here)
-    get_hw_ID();
+    unsigned char *hw_ID;
+    size_t hw_ID_len = 0;
+    kv_load("device-status", "hw-dev-id", (void **) &hw_ID, &hw_ID_len);
+    printf("Hardware-Device-ID: %02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X\r\n",
+           hw_ID[0], hw_ID[1], hw_ID[2], hw_ID[3], hw_ID[4], hw_ID[5], hw_ID[6], hw_ID[7],
+           hw_ID[8], hw_ID[9], hw_ID[10], hw_ID[11], hw_ID[12], hw_ID[13], hw_ID[14], hw_ID[15]);
+    free(hw_ID);
     // show the Public Key, if available
-
-    // TODO this is a reference outside of the component (use kv_load to load from flash)
-    if (!get_public_key(buffer)) {
-        printf("Public Key not available\r\n");
+    unsigned char *key;
+    // read the secret key
+    size_t size_pk = 0;
+    err = kv_load("key_storage", "public_key", (void **) &key, &size_pk);
+    if (!memory_error_check(err)) {
+        printf("Public Key: 0x");
+        for (int i = 0; i < size_pk; ++i) {
+            printf("%02X", key[i]);
+        }
+        printf("\r\n");
+        free(key);
     } else {
-        printf("Public Key: %s\r\n", buffer);
+        printf("Public Key not available\r\n");
     }
+
     // show the wifi login information, if available
     err = kv_load("wifi_data", "wifi_ssid", (void **) &wifi.ssid, &wifi.ssid_length);
     if (err == ESP_OK) {
@@ -80,6 +93,8 @@ static int run_status(int argc, char **argv) {
         ESP_LOGD(__func__, "%s", wifi.pwd);
         printf("Wifi SSID : %.*s\r\n", wifi.ssid_length, wifi.ssid);
         ESP_LOGD("Wifi PWD", "%.*s", wifi.pwd_length, wifi.pwd);
+        free(wifi.ssid);
+        free(wifi.pwd);
     } else {
         printf("! Wifi not configured yet! \r\n type join to do so \r\n");
     }
