@@ -1,11 +1,11 @@
 /*!
- * #file    ubirch_console.h
- * #brief   ubirch console
+ * @file    ubirch_console.h
+ * @brief   ubirch console
  *
- * #author Waldemar Gruenwald
- * #date   2018-11-14
+ * @author Waldemar Gruenwald
+ * @date   2018-11-14
  *
- * #copyright &copy; 2018 ubirch GmbH (https://ubirch.com)
+ * @copyright &copy; 2018 ubirch GmbH (https://ubirch.com)
  *
  * ```
  * Licensed under the Apache License, Version 2.0 (the "License");

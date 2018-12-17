@@ -4,6 +4,13 @@ set(COMPONENT_SRCS
         cmd_ubirch.c
         )
 set(COMPONENT_ADD_INCLUDEDIRS ".")
-set(COMPONENT_REQUIRES ubirch-esp32-networking ubirch-esp32-storage main)
-set(COMPONENT_PRIV_REQUIRES nvs_flash console)
+
+set(COMPONENT_REQUIRES
+        ubirch-esp32-networking
+        ubirch-esp32-storage
+        )
+set(COMPONENT_PRIV_REQUIRES
+        nvs_flash
+        console
+        )
 register_component()
