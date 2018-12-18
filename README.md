@@ -25,15 +25,15 @@ The following components are required for the functionality, see also
 - **deep_sleep**  `[-t <t>] [--io=<n>] [--io_level=<0|1>]` ->
 Enter deep sleep mode. Two wakeup modes are supported: timer and GPIO.
 If no wakeup option is specified, will sleep indefinitely.
-    - `-t, --time=<t>`  Wake up time, ms
-    - `--io=<n>`  If specified, wakeup using GPIO with given number
-    - `--io_level=<0|1>`  GPIO level to trigger wakeup
+    - `-t, --time=<t>`  Wake up time, ms (optional)
+    - `--io=<n>`  If specified, wakeup using GPIO with given number (optional)
+    - `--io_level=<0|1>`  GPIO level to trigger wakeup (optional)
 
 - **join**  `[--timeout=<t>] <ssid> [<pass>]` ->
   Join WiFi AP as a station
-  - `--timeout=<t>`  Connection timeout, ms
+  - `--timeout=<t>`  Connection timeout, ms (optional)
   - `<ssid>`  SSID of AP
-  - `<pass>`  PSK of AP
+  - `<pass>`  PSK of AP (optional)
 
 - **status** -> Get the current status of the system
 
@@ -55,4 +55,10 @@ if ((c == 0x03) || (c == 0x15)) {  //0x03 = Ctrl + C      0x15 = Ctrl + U
 
 ```
 
+## Tools for Serial Connection
 
+- `$IDF_PATH/tools/idf.py monitor`
+- `miniterm.py` is a tool from the [pyserial](https://github.com/pyserial/pyserial) package.
+    -  to use miniterm.py, open your prefered terminal and enter: `miniterm.py /dev/ttyUSB0 115200 --raw`
+        - where `/dev/ttyUSB0` is the COM port and `115200` is the baudrate. Both might have to be adjusted.
+         The `--raw` will give you the raw output, without the special control characters.
