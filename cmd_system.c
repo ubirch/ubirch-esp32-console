@@ -27,6 +27,7 @@
 #include "argtable3/argtable3.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "../esp-pn532/nfc_console.h"
 
 #ifdef CONFIG_FREERTOS_USE_STATS_FORMATTING_FUNCTIONS
 #define WITH_TASKS_INFO 1
@@ -49,6 +50,7 @@ void register_system() {
     register_restart();
     register_deep_sleep();
     register_make();
+    register_nfc();
 #if WITH_TASKS_INFO
     register_tasks();
 #endif
