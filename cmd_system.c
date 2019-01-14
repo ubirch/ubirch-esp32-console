@@ -27,7 +27,11 @@
 #include "argtable3/argtable3.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+
+#ifdef NFC_CONSOLE
 #include "../esp-pn532/nfc_console.h"
+
+#endif
 
 #ifdef CONFIG_FREERTOS_USE_STATS_FORMATTING_FUNCTIONS
 #define WITH_TASKS_INFO 1
@@ -50,7 +54,9 @@ void register_system() {
     register_restart();
     register_deep_sleep();
     register_make();
+#ifdef NFC_CONSOLE
     register_nfc();
+#endif
 #if WITH_TASKS_INFO
     register_tasks();
 #endif
@@ -170,7 +176,9 @@ static int deep_sleep(int argc, char **argv) {
         ESP_ERROR_CHECK(esp_sleep_enable_ext1_wakeup(1ULL << io_num, level));
     }
     rtc_gpio_isolate(GPIO_NUM_12);
-    esp_deep_sleep_start();
+    esp_light_sleep_start();
+
+    return 0;
 }
 
 static void register_deep_sleep() {
