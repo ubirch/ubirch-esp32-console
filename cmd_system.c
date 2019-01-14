@@ -29,8 +29,8 @@
 #include "freertos/task.h"
 
 #ifdef NFC_CONSOLE
-#include "../esp-pn532/nfc_console.h"
 
+#include "nfc_console.h"
 #endif
 
 #ifdef CONFIG_FREERTOS_USE_STATS_FORMATTING_FUNCTIONS
