@@ -65,7 +65,7 @@ void initialize_filesystem()
 
 
 void init_console() {
-    /* Disable buffering on stdin and stdout */
+	/* Disable buffering on stdin and stdout */
     setvbuf(stdin, NULL, _IONBF, 0);
     setvbuf(stdout, NULL, _IONBF, 0);
 
