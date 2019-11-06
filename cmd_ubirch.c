@@ -68,9 +68,9 @@ static int run_status(int argc, char **argv) {
 
     // show hardware device id
     kv_load("device-status", "hw-dev-id", (void **) &hw_ID, &hw_ID_len);
-    printf("Hardware-Device-ID: %02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X\r\n",
-           hw_ID[0], hw_ID[1], hw_ID[2], hw_ID[3], hw_ID[4], hw_ID[5], hw_ID[6], hw_ID[7],
-           hw_ID[8], hw_ID[9], hw_ID[10], hw_ID[11], hw_ID[12], hw_ID[13], hw_ID[14], hw_ID[15]);
+	printf("Hardware-Device-ID: %02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x\r\n",
+	       hw_ID[0], hw_ID[1], hw_ID[2], hw_ID[3], hw_ID[4], hw_ID[5], hw_ID[6], hw_ID[7],
+	       hw_ID[8], hw_ID[9], hw_ID[10], hw_ID[11], hw_ID[12], hw_ID[13], hw_ID[14], hw_ID[15]);
     free(hw_ID);
 
     // show the public key, if available
@@ -80,7 +80,7 @@ static int run_status(int argc, char **argv) {
     if (!memory_error_check(err)) {
         printf("Public key: ");
         for (int i = 0; i < key_size; ++i) {
-            printf("%02X", key[i]);
+	        printf("%02x", key[i]);
         }
         printf("\r\n");
         free(key);
