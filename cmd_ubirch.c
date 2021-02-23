@@ -134,6 +134,50 @@ void register_status() {
 }
 
 /*
+ * 'update_backendkey' command to set backend verification key or load default value into flash
+ */
+
+/*
+ * Arguments used by 'update_backendkey' function
+ */
+static struct {
+    struct arg_str *backendkey;
+    struct arg_end *end;
+} update_backendkey_args;
+
+static int update_backendkey(int argc, char **argv) {
+    int nerrors = arg_parse(argc, argv, (void **) &update_backendkey_args);
+    if (nerrors != 0) {
+        arg_print_errors(stderr, update_backendkey_args.end, argv[0]);
+        return 1;
+    }
+
+    if (update_backendkey_args.backendkey->count == 0 && set_backend_default_public_key() == ESP_OK) {
+        return 0;
+    } else if (update_backendkey_args.backendkey->count == 1
+            && set_backend_public_key(update_backendkey_args.backendkey->sval[0]) == ESP_OK) {
+        return 0;
+    }
+    return 1;
+}
+
+void register_update_backendkey() {
+    update_backendkey_args.backendkey = arg_str0(NULL, NULL, "<backendkey>", "Backend signing key in base64 format");
+    update_backendkey_args.backendkey->sval[0] = ""; // default value
+    update_backendkey_args.end = arg_end(2);
+
+    const esp_console_cmd_t update_backendkey_cmd = {
+            .command = "update_backendkey",
+            .help = "Update backend key or reset to default value",
+            .hint = NULL,
+            .func = &update_backendkey,
+            .argtable = &update_backendkey_args
+    };
+
+    ESP_ERROR_CHECK(esp_console_cmd_register(&update_backendkey_cmd));
+}
+
+/*
  * 'join' command to connect with wifi network
  */
 

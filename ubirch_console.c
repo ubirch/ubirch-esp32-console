@@ -129,6 +129,7 @@ void run_console(void) {
     register_system();
     register_wifi();
     register_status();
+    register_update_backendkey();
     register_exit();
 
     /* Prompt to be printed before each line.
