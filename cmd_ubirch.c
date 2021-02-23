@@ -33,6 +33,7 @@
 
 #include "cmd_ubirch.h"
 #include "storage.h"
+#include "key_handling.h"
 
 /*
  * 'exit' command exits the console and runs the rest of the program
@@ -86,6 +87,14 @@ static int run_status(int argc, char **argv) {
         free(key);
     } else {
         printf("Public key not available.\r\n");
+    }
+
+    // show backend key
+    char keybuffer[PUBLICKEY_BASE64_STRING_LENGTH + 1];
+    if (get_backend_public_key(keybuffer, sizeof(keybuffer)) == ESP_OK) {
+        printf("Backend public key: %s\n", keybuffer);
+    } else {
+        printf("Backend public key not available.\r\n");
     }
 
     // show the wifi login information, if available
