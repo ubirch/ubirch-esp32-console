@@ -40,5 +40,8 @@ void register_exit();
 // Register the status
 void register_status();
 
+// Register update_backendkey
+void register_update_backendkey();
+
 
 #endif //EXAMPLE_ESP32_CONSOLE_CMD_H

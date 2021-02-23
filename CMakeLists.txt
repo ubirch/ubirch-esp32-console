@@ -10,6 +10,7 @@ set(COMPONENT_REQUIRES
         ubirch-esp32-storage
         )
 set(COMPONENT_PRIV_REQUIRES
+        ubirch-esp32-key-storage
         nvs_flash
         console
         )
