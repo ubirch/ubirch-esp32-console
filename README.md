@@ -35,6 +35,11 @@ If no wakeup option is specified, will sleep indefinitely.
   - `<ssid>`  SSID of AP
   - `<pass>`  PSK of AP (optional)
 
+- **update_backendkey** `[<backendkey>]` ->
+  Updates the backend public key, which is used to verify responses from the backend
+  - `[<backendkey>]` backend public key in base64 string format (optional, if none is given, the key is reset to the
+     default key given as Kconfig configuration value).
+
 - **status** -> Get the current status of the system
 
 - **exit** -> Exit the console and resume with program
