@@ -162,13 +162,13 @@ static int update_backendkey(int argc, char **argv) {
 }
 
 void register_update_backendkey() {
-    update_backendkey_args.backendkey = arg_str0(NULL, NULL, "<backendkey>", "Backend signing key in base64 format");
+    update_backendkey_args.backendkey = arg_str0(NULL, NULL, "<backendkey>", "Backend public key in base64 format");
     update_backendkey_args.backendkey->sval[0] = ""; // default value
     update_backendkey_args.end = arg_end(2);
 
     const esp_console_cmd_t update_backendkey_cmd = {
             .command = "update_backendkey",
-            .help = "Update backend key or reset to default value",
+            .help = "Update backend key or reset to default key if <backendkey>-option is empty.",
             .hint = NULL,
             .func = &update_backendkey,
             .argtable = &update_backendkey_args
