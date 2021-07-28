@@ -78,7 +78,7 @@ void init_console() {
      * correct while APB frequency is changing in light sleep mode.
      */
     const uart_config_t uart_config = {
-            .baud_rate = CONFIG_CONSOLE_UART_BAUDRATE,
+            .baud_rate = CONFIG_ESP_CONSOLE_UART_BAUDRATE,
             .data_bits = UART_DATA_8_BITS,
             .parity = UART_PARITY_DISABLE,
             .stop_bits = UART_STOP_BITS_1,
