@@ -34,6 +34,7 @@
 #include "cmd_ubirch.h"
 #include "storage.h"
 #include "key_handling.h"
+#include "id_handling.h"
 
 /*
  * 'exit' command exits the console and runs the rest of the program
@@ -68,23 +69,21 @@ static int run_status(int argc, char **argv) {
     printf("UBIRCH device status:\r\n");
 
     // show hardware device id
-    kv_load("device-status", "hw-dev-id", (void **) &hw_ID, &hw_ID_len);
+    ubirch_uuid_get(&hw_ID, &hw_ID_len);
 	printf("Hardware-Device-ID: %02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x\r\n",
 	       hw_ID[0], hw_ID[1], hw_ID[2], hw_ID[3], hw_ID[4], hw_ID[5], hw_ID[6], hw_ID[7],
 	       hw_ID[8], hw_ID[9], hw_ID[10], hw_ID[11], hw_ID[12], hw_ID[13], hw_ID[14], hw_ID[15]);
-    free(hw_ID);
 
     // show the public key, if available
-    unsigned char *key;
+    unsigned char *key = NULL;
     size_t key_size = 0;
-    err = kv_load("key_storage", "public_key", (void **) &key, &key_size);
+    err = ubirch_public_key_get(&key, &key_size);
     if (!memory_error_check(err)) {
         printf("Public key: ");
         for (int i = 0; i < key_size; ++i) {
 	        printf("%02x", key[i]);
         }
         printf("\r\n");
-        free(key);
     } else {
         printf("Public key not available.\r\n");
     }
