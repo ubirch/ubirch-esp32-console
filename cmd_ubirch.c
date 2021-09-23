@@ -66,7 +66,13 @@ static int run_status(int argc, char **argv) {
     unsigned char *hw_ID = NULL;
     size_t hw_ID_len = 0;
 
-    printf("UBIRCH device status:\r\n");
+    const char* current_short_name = ubirch_id_context_get();
+    if (*current_short_name == 0x00) {
+        printf("Currently no valid ID loaded\r\n");
+        return ESP_OK;
+    }
+
+    printf("UBIRCH device (%s) status:\r\n", current_short_name);
 
     // show hardware device id
     ubirch_uuid_get(&hw_ID, &hw_ID_len);
