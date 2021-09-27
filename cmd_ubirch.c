@@ -183,6 +183,61 @@ void register_update_backendkey() {
 }
 
 /*
+ * 'update_password' command to set the password
+ */
+
+/*
+ * Arguments used by 'update_password' function
+ */
+static struct {
+    struct arg_str *password;
+    struct arg_end *end;
+} update_password_args;
+
+static int update_password(int argc, char **argv) {
+    const char* current_short_name = ubirch_id_context_get();
+    if (*current_short_name == 0x00) {
+        printf("Currently no valid ID loaded\r\n");
+        return ESP_OK;
+    }
+
+    int nerrors = arg_parse(argc, argv, (void **) &update_password_args);
+    if (nerrors != 0) {
+        arg_print_errors(stderr, update_password_args.end, argv[0]);
+        return 1;
+    }
+
+    if (update_password_args.password->count != 1
+            || ubirch_password_set(update_password_args.password->sval[0],
+                strlen(update_password_args.password->sval[0])) != ESP_OK) {
+        printf("failed to set password, check password length\r\n");
+        return 1;
+    }
+    if (ubirch_id_context_store() != ESP_OK) {
+        printf("update failed\r\n");
+        return 1;
+    }
+    printf("Ok\r\n");
+    return 0;
+}
+
+void register_update_password() {
+    update_password_args.password = arg_str0(NULL, NULL, "<password>", "Password as string");
+    update_password_args.password->sval[0] = ""; // default value
+    update_password_args.end = arg_end(2);
+
+    const esp_console_cmd_t update_password_cmd = {
+            .command = "update_password",
+            .help = "Update password of current id.",
+            .hint = NULL,
+            .func = &update_password,
+            .argtable = &update_password_args
+    };
+
+    ESP_ERROR_CHECK(esp_console_cmd_register(&update_password_cmd));
+}
+
+/*
  * 'join' command to connect with wifi network
  */
 

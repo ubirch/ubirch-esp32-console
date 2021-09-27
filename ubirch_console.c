@@ -131,6 +131,7 @@ void run_console(void) {
     register_status();
     register_update_backendkey();
     register_update_keys();
+    register_update_password();
     register_exit();
 
     /* Prompt to be printed before each line.
