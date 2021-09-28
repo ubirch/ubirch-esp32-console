@@ -38,9 +38,11 @@ If no wakeup option is specified, will sleep indefinitely.
 - **update_backendkey** `[<backendkey>]` ->
   Updates the backend public key, which is used to verify responses from the backend
   - `[<backendkey>]` backend public key in base64 string format (optional, if none is given, the key is reset to the
-     default key given as Kconfig configuration value).
+     default key given as Kconfig configuration value)
+- **update_password** [<password>] ->
+  Updates the password of currently loaded ID
 
-- **status** -> Get the current status of the system
+- **status** -> Get the current status of the system, including details of the currently loaded ID
 
 - **exit** -> Exit the console and resume with program
 
