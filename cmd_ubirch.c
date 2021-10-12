@@ -242,3 +242,22 @@ void register_wifi() {
     ESP_ERROR_CHECK(esp_console_cmd_register(&join_cmd));
 }
 
+/*
+ * 'update_keys' command to create new key pair and update it in backend
+ */
+
+static int run_update_keys(int argc, char **argv) {
+    update_keys();
+    return 0;
+}
+
+void register_update_keys() {
+    const esp_console_cmd_t cmd = {
+            .command = "update_keys",
+            .help = "Update key pair and update it in backend.",
+            .hint = NULL,
+            .func = &run_update_keys,
+    };
+
+    ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
+}
