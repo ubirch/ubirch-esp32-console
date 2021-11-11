@@ -28,7 +28,7 @@
 #include <argtable3/argtable3.h>
 #include <string.h>
 
-//#include "key_handling.h"
+#include "keys.h"
 #include "networking.h"
 
 #include "cmd_ubirch.h"
