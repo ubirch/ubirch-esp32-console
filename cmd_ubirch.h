@@ -46,5 +46,7 @@ void register_update_backendkey();
 // Register update_keys
 void register_update_keys();
 
+// Register update_password
+void register_update_password();
 
 #endif //EXAMPLE_ESP32_CONSOLE_CMD_H

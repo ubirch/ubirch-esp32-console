@@ -11,6 +11,7 @@ set(COMPONENT_REQUIRES
         )
 set(COMPONENT_PRIV_REQUIRES
         ubirch-esp32-key-storage
+        ubirch-esp32-api-http
         nvs_flash
         console
         )

@@ -28,12 +28,13 @@
 #include <argtable3/argtable3.h>
 #include <string.h>
 
-//#include "key_handling.h"
+#include "keys.h"
 #include "networking.h"
 
 #include "cmd_ubirch.h"
 #include "storage.h"
 #include "key_handling.h"
+#include "id_handling.h"
 
 /*
  * 'exit' command exits the console and runs the rest of the program
@@ -65,26 +66,30 @@ static int run_status(int argc, char **argv) {
     unsigned char *hw_ID = NULL;
     size_t hw_ID_len = 0;
 
-    printf("UBIRCH device status:\r\n");
+    const char* current_short_name = ubirch_id_context_get();
+    if (*current_short_name == 0x00) {
+        printf("Currently no valid ID loaded\r\n");
+        return ESP_OK;
+    }
+
+    printf("UBIRCH device (%s) status:\r\n", current_short_name);
 
     // show hardware device id
-    kv_load("device-status", "hw-dev-id", (void **) &hw_ID, &hw_ID_len);
+    ubirch_uuid_get(&hw_ID, &hw_ID_len);
 	printf("Hardware-Device-ID: %02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x\r\n",
 	       hw_ID[0], hw_ID[1], hw_ID[2], hw_ID[3], hw_ID[4], hw_ID[5], hw_ID[6], hw_ID[7],
 	       hw_ID[8], hw_ID[9], hw_ID[10], hw_ID[11], hw_ID[12], hw_ID[13], hw_ID[14], hw_ID[15]);
-    free(hw_ID);
 
     // show the public key, if available
-    unsigned char *key;
+    unsigned char *key = NULL;
     size_t key_size = 0;
-    err = kv_load("key_storage", "public_key", (void **) &key, &key_size);
+    err = ubirch_public_key_get(&key, &key_size);
     if (!memory_error_check(err)) {
         printf("Public key: ");
         for (int i = 0; i < key_size; ++i) {
 	        printf("%02x", key[i]);
         }
         printf("\r\n");
-        free(key);
     } else {
         printf("Public key not available.\r\n");
     }
@@ -178,6 +183,61 @@ void register_update_backendkey() {
 }
 
 /*
+ * 'update_password' command to set the password
+ */
+
+/*
+ * Arguments used by 'update_password' function
+ */
+static struct {
+    struct arg_str *password;
+    struct arg_end *end;
+} update_password_args;
+
+static int update_password(int argc, char **argv) {
+    const char* current_short_name = ubirch_id_context_get();
+    if (*current_short_name == 0x00) {
+        printf("Currently no valid ID loaded\r\n");
+        return ESP_OK;
+    }
+
+    int nerrors = arg_parse(argc, argv, (void **) &update_password_args);
+    if (nerrors != 0) {
+        arg_print_errors(stderr, update_password_args.end, argv[0]);
+        return 1;
+    }
+
+    if (update_password_args.password->count != 1
+            || ubirch_password_set(update_password_args.password->sval[0],
+                strlen(update_password_args.password->sval[0])) != ESP_OK) {
+        printf("failed to set password, check password length\r\n");
+        return 1;
+    }
+    if (ubirch_id_context_store() != ESP_OK) {
+        printf("update failed\r\n");
+        return 1;
+    }
+    printf("Ok\r\n");
+    return 0;
+}
+
+void register_update_password() {
+    update_password_args.password = arg_str0(NULL, NULL, "<password>", "Password as string");
+    update_password_args.password->sval[0] = ""; // default value
+    update_password_args.end = arg_end(2);
+
+    const esp_console_cmd_t update_password_cmd = {
+            .command = "update_password",
+            .help = "Update password of current id.",
+            .hint = NULL,
+            .func = &update_password,
+            .argtable = &update_password_args
+    };
+
+    ESP_ERROR_CHECK(esp_console_cmd_register(&update_password_cmd));
+}
+
+/*
  * 'join' command to connect with wifi network
  */
 
@@ -248,6 +308,9 @@ void register_wifi() {
 
 static int run_update_keys(int argc, char **argv) {
     update_keys();
+    if (ubirch_id_context_store() != ESP_OK) {
+        printf("Failed to store ID context after key update");
+    }
     return 0;
 }
 
