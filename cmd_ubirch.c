@@ -308,6 +308,9 @@ void register_wifi() {
 
 static int run_update_keys(int argc, char **argv) {
     update_keys();
+    if (ubirch_id_context_store() != ESP_OK) {
+        printf("Failed to store ID context after key update");
+    }
     return 0;
 }
 
